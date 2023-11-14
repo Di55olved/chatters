@@ -1,6 +1,6 @@
-# we_chat_application
+# Chatter
 
-A new Flutter project.
+A Flutter project dedicated for CSE450.
 
 ## Getting Started
 
