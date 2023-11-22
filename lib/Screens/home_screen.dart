@@ -17,7 +17,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Cuser> list = [];
+  List<Cuser> _list = [];
+  final List<Cuser> _searchList = [];
+  // for storing search status
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -29,17 +32,42 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chatters"),
+        title: _isSearching
+                ? TextField(
+                    decoration: const InputDecoration(
+                        border: InputBorder.none, hintText: 'Name, Email, ...'),
+                    autofocus: true,
+                    style: const TextStyle(fontSize: 17, letterSpacing: 0.5),
+                    //when search text changes then updated search list
+                    onChanged: (val) {
+                      //search logic
+                      _searchList.clear();
+
+                      for (var i in _list) {
+                        if (i.name.toLowerCase().contains(val.toLowerCase()) ||
+                            i.email.toLowerCase().contains(val.toLowerCase())) {
+                          _searchList.add(i);
+                          setState(() {
+                            _searchList;
+                          });
+                        }
+                      }
+                    },
+                  )
+                : const Text('We Chat'),
         leading: const Icon(
           CupertinoIcons.home,
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
-            color: Colors.black,
-          ),
-          IconButton(
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = !_isSearching;
+                    });
+                  },
+                  icon: Icon(_isSearching
+                      ? CupertinoIcons.clear_circled_solid
+                      : Icons.search)),          IconButton(
             onPressed: () {
               Navigator.push(
               context, MaterialPageRoute(builder: (_) =>  ProfileScreen(user: APIs.me)));
@@ -69,15 +97,15 @@ class _HomeScreenState extends State<HomeScreen> {
             case ConnectionState.active:
             case ConnectionState.done:
               final data = snapshot.data?.docs;
-              list = data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
+              _list = data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
 
               case ConnectionState.done:
                 final data = snapshot.data?.docs;
-                list = data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
+                _list = data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
 
                 print('Data: $data'); // Check the retrieved data
 
-                if (list.isEmpty) {
+                if (_list.isEmpty) {
                   print('List is empty'); // Log if the list is empty
                   return const Center(
                     child: Text(
@@ -88,12 +116,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 } 
           }
                 return ListView.builder(
-                  itemCount: list.length,
+                  itemCount: _isSearching? _searchList.length: _list.length,
                   padding: EdgeInsets.only(
                       top: MediaQuery.sizeOf(context).height * .01),
                   physics: const BouncingScrollPhysics(),
                   itemBuilder: (context, index) {
-                    return ChatterCard(user: list[index]);
+                    return ChatterCard(
+                    user: _isSearching
+                  ? _searchList[index]
+                  : _list[index]  
+                  );
                   },
                 );
         },
