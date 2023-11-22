@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return await APIs.auth.signInWithCredential(credential);
     } catch (e) {
       log('\n_signInWithGoogle: $e');
-      Dialogs.showSnackBar(context, "Anomaly Detected: Check Internet!");
+      Dialogs.showSnackBar(context, "$e");
       return null;
     }
   }

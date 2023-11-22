@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:we_chat_application/API/api.dart';
+import 'package:we_chat_application/Screens/profile_screen.dart';
 import 'package:we_chat_application/Widgets/chatter_card.dart';
 import 'package:we_chat_application/Models/user.dart';
 
@@ -17,6 +18,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Cuser> list = [];
+
+  @override
+  void initState() {
+    super.initState();
+    APIs.getSelfInfo();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +40,10 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.black,
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+              context, MaterialPageRoute(builder: (_) =>  ProfileScreen(user: APIs.me)));
+            },
             icon: const Icon(Icons.more_vert),
             color: Colors.black,
           )
@@ -50,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: StreamBuilder(
-        stream: APIs.firestore.collection("users").snapshots(),
+        stream: APIs.getAllUsers(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
@@ -61,14 +71,22 @@ class _HomeScreenState extends State<HomeScreen> {
               final data = snapshot.data?.docs;
               list = data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
 
-              if (list.isEmpty) {
-                return const Center(
-                  child: Text(
-                    "Connection Unavailble",
-                    style: TextStyle(fontSize: 30),
-                  ),
-                );
-              } else {
+              case ConnectionState.done:
+                final data = snapshot.data?.docs;
+                list = data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
+
+                print('Data: $data'); // Check the retrieved data
+
+                if (list.isEmpty) {
+                  print('List is empty'); // Log if the list is empty
+                  return const Center(
+                    child: Text(
+                      "Connection Unavailable",
+                      style: TextStyle(fontSize: 30),
+                    ),
+                  );
+                } 
+          }
                 return ListView.builder(
                   itemCount: list.length,
                   padding: EdgeInsets.only(
@@ -78,8 +96,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     return ChatterCard(user: list[index]);
                   },
                 );
-              }
-          }
         },
       ),
     );

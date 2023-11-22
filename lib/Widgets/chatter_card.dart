@@ -4,7 +4,7 @@ import 'package:we_chat_application/Models/user.dart';
 
 class ChatterCard extends StatefulWidget {
   final Cuser user;
-  const ChatterCard({super.key, required this.user});
+  const  ChatterCard({super.key, required this.user});
 
   @override
   State<ChatterCard> createState() => _ChatterCardState();
