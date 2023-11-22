@@ -1,13 +1,13 @@
 class Cuser {
-  late final String id;
-  late final String about;
-  late final String createdAt;
-  late final bool isOnline;
-  late final String lastActive;
-  late final String email;
-  late final String pushToken;
-  late final String name;
-  late final String image;
+  late  String id;
+  late  String about;
+  late  String createdAt;
+  late  bool isOnline;
+  late  String lastActive;
+  late  String email;
+  late  String pushToken;
+  late  String name;
+  late  String image;
 
   Cuser(
       {required this.id,
