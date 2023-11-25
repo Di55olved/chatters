@@ -1,6 +1,8 @@
+import 'package:chatters/Screens/chatter_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:we_chat_application/Models/user.dart';
+import 'package:chatters/Models/user.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ChatterCard extends StatefulWidget {
   final Cuser user;
@@ -20,10 +22,27 @@ class _ChatterCardState extends State<ChatterCard> {
       elevation: 2,
       color: Colors.lightBlue[100],
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+        Navigator.push(
+        context, MaterialPageRoute(builder: (_) =>  ChatterScreen(user: widget.user)));
+        },
         child: ListTile(
-          leading: const CircleAvatar(
-            child: Icon(CupertinoIcons.person),
+          leading: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.1, // Adjust as needed
+            height: MediaQuery.of(context).size.width * 0.1, // Adjust as needed
+            
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(MediaQuery.of(context).size.height * 0.03),
+              child: CachedNetworkImage(
+                width: MediaQuery.sizeOf(context).width*.055,
+                height: MediaQuery.sizeOf(context).height*.055,
+                imageUrl: widget.user.image,
+                errorWidget: (context, url, error) => const CircleAvatar(
+                  child: Icon(CupertinoIcons.person),
+              ),
+              
+              ),
+            ),
           ),
           title:  Text(widget.user.name),
           subtitle:  Text(
@@ -39,3 +58,5 @@ class _ChatterCardState extends State<ChatterCard> {
     );
   }
 }
+
+

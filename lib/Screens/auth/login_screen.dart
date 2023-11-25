@@ -6,9 +6,9 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:we_chat_application/API/api.dart';
-import 'package:we_chat_application/Screens/home_screen.dart';
-import 'package:we_chat_application/Support/dialogs.dart';
+import 'package:chatters/API/api.dart';
+import 'package:chatters/Screens/home_screen.dart';
+import 'package:chatters/Support/dialogs.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

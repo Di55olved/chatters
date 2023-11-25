@@ -1,11 +1,11 @@
 
+import 'package:chatters/API/api.dart';
+import 'package:chatters/Models/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:we_chat_application/API/api.dart';
-import 'package:we_chat_application/Models/user.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:we_chat_application/Screens/auth/login_screen.dart';
+import 'package:chatters/Screens/auth/login_screen.dart';
 
 import '../Support/dialogs.dart';
 import '../main.dart';
@@ -79,19 +79,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 SizedBox(width: MediaQuery.sizeOf(context).width,height: MediaQuery.sizeOf(context).height*0.03),
                                
-                                ClipRRect(
-                  borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height),
-                  child: CachedNetworkImage(
-                    width: MediaQuery.sizeOf(context).height * 0.2,
-                    height: MediaQuery.sizeOf(context).height * 0.2,
-                    fit: BoxFit.cover,
-                    imageUrl: widget.user.image,
-                    errorWidget: (context, url, error) => CircleAvatar(
-                      child: Icon(CupertinoIcons.person),
-                    ),
-                  ),
-                                ),
-                                SizedBox(width: MediaQuery.sizeOf(context).width,height: MediaQuery.sizeOf(context).height*0.03),
+            SizedBox(
+            width: MediaQuery.of(context).size.width * 0.2, // Adjust as needed
+            height: MediaQuery.of(context).size.width * 0.2, // Adjust as needed
+            
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(MediaQuery.of(context).size.height * 0.03),
+              child: CachedNetworkImage(
+                width: MediaQuery.sizeOf(context).width*.1,
+                height: MediaQuery.sizeOf(context).height*.1,
+                imageUrl: widget.user.image,
+                errorWidget: (context, url, error) => const CircleAvatar(
+                  child: Icon(CupertinoIcons.person),
+              ),
+              
+              ),
+            ),
+          ),                  SizedBox(width: MediaQuery.sizeOf(context).width,height: MediaQuery.sizeOf(context).height*0.03),
                             
                             
                   Text(widget.user.email,

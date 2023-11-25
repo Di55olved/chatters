@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:we_chat_application/Screens/splash_screen.dart';
+import 'package:chatters/Screens/splash_screen.dart';
 import 'firebase_options.dart';
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
@@ -22,8 +21,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
         title: 'Chatter',
         theme: ThemeData(
+          useMaterial3: false,
           appBarTheme: const AppBarTheme(
               centerTitle: true,
               elevation: 1,

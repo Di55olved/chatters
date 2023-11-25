@@ -1,7 +1,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:we_chat_application/Models/user.dart';
+import 'package:chatters/Models/user.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class APIs {
   //for auntheniciation
@@ -10,6 +11,8 @@ class APIs {
   // for accessing cloud firestore database
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
   
+  static FirebaseStorage storage = FirebaseStorage.instance;
+
   static late Cuser me;
   //getter method
   static get user => auth.currentUser!;
