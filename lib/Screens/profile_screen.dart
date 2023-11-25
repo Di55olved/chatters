@@ -95,7 +95,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               
               ),
             ),
-          ),                  SizedBox(width: MediaQuery.sizeOf(context).width,height: MediaQuery.sizeOf(context).height*0.03),
+          ),                
+            SizedBox(width: MediaQuery.sizeOf(context).width,height: MediaQuery.sizeOf(context).height*0.03),
                             
                             
                   Text(widget.user.email,
