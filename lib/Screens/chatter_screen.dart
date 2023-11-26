@@ -1,6 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chatters/API/api.dart';
 import 'package:chatters/Models/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +29,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
         children: [
           Expanded(
             child: StreamBuilder(
-                   //     stream: APIs.getAllUsers(),
+              stream: APIs.getAllMessages(),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
@@ -33,7 +37,8 @@ class _ChatterScreenState extends State<ChatterScreen> {
                 //    return const Center(child: CircularProgressIndicator());
                   case ConnectionState.active:
                   case ConnectionState.done:
-                    // final data = snapshot.data?.docs;
+                     final data = snapshot.data?.docs;
+                     log('Data: ${jsonEncode(data![0].data())}');
                     // _list =
                     //     data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
                      //         final data = snapshot.data?.docs;
@@ -41,7 +46,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
                      //             data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
             
                      //         print('Data: $data'); // Check the retrieved data
-                    final _list = [];
+                    final _list = ['hi','hello'];
             
                     if (_list.isNotEmpty) {
                     return ListView.builder(
@@ -64,7 +69,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
             
                     }
                 }
-              }, stream: null,
+              },
             ),
           ),
           _chatInput()

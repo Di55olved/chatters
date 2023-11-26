@@ -19,8 +19,8 @@ class _ChatterCardState extends State<ChatterCard> {
       margin: EdgeInsets.symmetric(
           horizontal: MediaQuery.sizeOf(context).width * 0.02, vertical: 4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 2,
-      color: Colors.lightBlue[100],
+      elevation: 1,
+  //    color: Colors.lightBlue[100],
       child: InkWell(
         onTap: () {
         Navigator.push(

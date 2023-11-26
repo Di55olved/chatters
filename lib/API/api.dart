@@ -65,6 +65,10 @@ class APIs {
     return firestore.collection("users").snapshots();
   }
 
+   static Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages() {
+    return firestore.collection("messages").snapshots();
+  }
+
     static Future<void> updateUserInfo() async {
     await firestore.collection('users').doc(user.uid).update({
       'name': me.name,
