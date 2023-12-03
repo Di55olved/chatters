@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'dart:developer';
 
+import 'package:chatters/core/repository/user_repo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -11,7 +12,8 @@ import 'package:chatters/Screens/home_screen.dart';
 import 'package:chatters/Support/dialogs.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final UserRepository userRepository;
+  const LoginScreen({Key? key, required this.userRepository}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -39,12 +41,13 @@ class _LoginScreenState extends State<LoginScreen> {
         log("User Additional Info: ${user.additionalUserInfo}");
 
         if (await APIs.chatterExists()) {
+          // ignore: use_build_context_synchronously
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+              context, MaterialPageRoute(builder: (_) =>  HomeScreen(userRepository: widget.userRepository)));
         } else {
           APIs.createChatter().then((value) {
             Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+                context, MaterialPageRoute(builder: (_) =>  HomeScreen(userRepository: widget.userRepository)));
           });
         }
 

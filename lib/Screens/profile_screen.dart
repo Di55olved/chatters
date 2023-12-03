@@ -1,6 +1,7 @@
 
 import 'package:chatters/API/api.dart';
 import 'package:chatters/Models/user.dart';
+import 'package:chatters/core/repository/user_repo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,9 +13,9 @@ import '../main.dart';
 
 
 class ProfileScreen extends StatefulWidget {
-
+ final UserRepository userRepository;
  final Cuser user;
-  const ProfileScreen({super.key, required this.user});
+  const ProfileScreen({super.key, required this.user, required this.userRepository});
 
 
   @override
@@ -62,7 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.pop(context);
           
                     Navigator.pushReplacement(context, 
-                    MaterialPageRoute(builder: (_) => const LoginScreen()));
+                    MaterialPageRoute(builder: (_) => LoginScreen(userRepository: widget.userRepository)));
                  });
               });
             },

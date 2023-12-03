@@ -1,8 +1,15 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:chatters/bloc/user_bloc/user_bloc.dart';
+import 'package:chatters/bloc/user_bloc/user_event.dart';
+import 'package:chatters/bloc/user_bloc/user_states.dart';
+import 'package:chatters/core/repository/user_repo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:chatters/API/api.dart';
 import 'package:chatters/Screens/profile_screen.dart';
@@ -10,13 +17,16 @@ import 'package:chatters/Widgets/chatter_card.dart';
 import 'package:chatters/Models/user.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final UserRepository userRepository;
+
+  const HomeScreen({super.key, required this.userRepository});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late UserBloc _userBloc;
   List<Cuser> _list = [];
   final List<Cuser> _searchList = [];
   // for storing search status
@@ -25,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _userBloc = UserBloc(userRepository: widget.userRepository);
+    _userBloc.add(const FetchUser());
     APIs.getSelfInfo();
   }
 
@@ -44,108 +56,134 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         child: Scaffold(
-          appBar: AppBar(
-            title: _isSearching
-                ? TextField(
-                    decoration: const InputDecoration(
-                        border: InputBorder.none, hintText: 'Name, Email, ...'),
-                    autofocus: true,
-                    style: const TextStyle(fontSize: 17, letterSpacing: 0.5),
-                    //when search text changes then updated search list
-                    onChanged: (val) {
-                      //search logic
-                      _searchList.clear();
+            appBar: AppBar(
+              title: _isSearching
+                  ? TextField(
+                      decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Name, Email, ...'),
+                      autofocus: true,
+                      style: const TextStyle(fontSize: 17, letterSpacing: 0.5),
+                      //when search text changes then updated search list
+                      onChanged: (val) {
+                        //search logic
+                        _searchList.clear();
 
-                      for (var i in _list) {
-                        if (i.name.toLowerCase().contains(val.toLowerCase()) ||
-                            i.email.toLowerCase().contains(val.toLowerCase())) {
-                          _searchList.add(i);
-                          setState(() {
-                            _searchList;
-                          });
+                        for (var i in _list) {
+                          if (i.name
+                                  .toLowerCase()
+                                  .contains(val.toLowerCase()) ||
+                              i.email
+                                  .toLowerCase()
+                                  .contains(val.toLowerCase())) {
+                            _searchList.add(i);
+                            setState(() {
+                              _searchList;
+                            });
+                          }
                         }
+                      },
+                    )
+                  : const Text('Chatters'),
+              leading: const Icon(
+                CupertinoIcons.home,
+              ),
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = !_isSearching;
+                      });
+                    },
+                    icon: Icon(_isSearching
+                        ? CupertinoIcons.clear_circled_solid
+                        : Icons.search)),
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => ProfileScreen(user: APIs.me, userRepository: widget.userRepository)));
+                  },
+                  icon: const Icon(Icons.more_vert),
+                  color: Colors.black,
+                )
+              ],
+            ),
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  await APIs.auth.signOut();
+                  await GoogleSignIn().signOut();
+                },
+                child: const Icon(Icons.add_comment_rounded),
+              ),
+            ),
+            body: BlocBuilder(
+              bloc: _userBloc,
+              builder: (_, UserState state) {
+                if (state is UserEmpty) {
+                  return const Center(child: Text('Empty state'));
+                }
+                if (state is UserLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (state is UserLoaded) {
+                  return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: state.user(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        List<Cuser> userList = snapshot.data!.docs
+                            .map((doc) => Cuser.fromJson(doc.data()))
+                            .toList();
+
+                        if (userList.isEmpty) {
+                          // Handle empty list
+                          return const Center(
+                            child: Text(
+                              "No Users Available",
+                              style: TextStyle(fontSize: 30),
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          itemCount: userList.length,
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * .01,
+                          ),
+                          physics: const BouncingScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return ChatterCard(
+                              user: userList[index],
+                            );
+                          },
+                        );
+                      } else if (snapshot.hasError) {
+                        // Handle error state
+                        return Center(
+                          child: Text(
+                            "Error: ${snapshot.error}",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        );
+                      } else {
+                        // Handle initial loading state
+                        return const Center(child: CircularProgressIndicator());
                       }
                     },
-                  )
-                : const Text('Chatters'),
-            leading: const Icon(
-              CupertinoIcons.home,
-            ),
-            actions: [
-              IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = !_isSearching;
-                    });
-                  },
-                  icon: Icon(_isSearching
-                      ? CupertinoIcons.clear_circled_solid
-                      : Icons.search)),
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => ProfileScreen(user: APIs.me)));
-                },
-                icon: const Icon(Icons.more_vert),
-                color: Colors.black,
-              )
-            ],
-          ),
-          floatingActionButton: Padding(
-            padding: const EdgeInsets.only(bottom: 10.0),
-            child: FloatingActionButton(
-              onPressed: () async {
-                await APIs.auth.signOut();
-                await GoogleSignIn().signOut();
+                  );
+                }
+                if (state is UserError) {
+                  return const Text(
+                    'Something went wrong!',
+                    style: TextStyle(color: Colors.red),
+                  );
+                }
+                return const SizedBox();
               },
-              child: const Icon(Icons.add_comment_rounded),
-            ),
-          ),
-          body: StreamBuilder(
-            stream: APIs.getAllUsers(),
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                case ConnectionState.none:
-                  return const Center(child: CircularProgressIndicator());
-                case ConnectionState.active:
-                case ConnectionState.done:
-                  final data = snapshot.data?.docs;
-                  _list =
-                      data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
-
-                case ConnectionState.done:
-                  final data = snapshot.data?.docs;
-                  _list =
-                      data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
-
-                  print('Data: $data'); // Check the retrieved data
-
-                  if (_list.isEmpty) {
-                    print('List is empty'); // Log if the list is empty
-                    return const Center(
-                      child: Text(
-                        "Connection Unavailable",
-                        style: TextStyle(fontSize: 30),
-                      ),
-                    );
-                  }
-              }
-              return ListView.builder(
-                itemCount: _isSearching ? _searchList.length : _list.length,
-                padding: EdgeInsets.only(
-                    top: MediaQuery.sizeOf(context).height * .01),
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return ChatterCard(
-                      user: _isSearching ? _searchList[index] : _list[index]);
-                },
-              );
-            },
-          ),
-        ),
+            )),
       ),
     );
   }

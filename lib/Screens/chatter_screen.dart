@@ -38,7 +38,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
                   case ConnectionState.active:
                   case ConnectionState.done:
                      final data = snapshot.data?.docs;
-                     log('Data: ${jsonEncode(data![0].data())}');
+//                     log('Data: ${jsonEncode(data[0].data())}');
                     // _list =
                     //     data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
                      //         final data = snapshot.data?.docs;
