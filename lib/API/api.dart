@@ -60,6 +60,12 @@ class APIs {
             .set(chatter_user.toJson()));
   }
 
+  static String getConversationID(String id) => user.uid.hashCode <= 
+  id.hashCode ? '${user.uid}_$id' 
+  : '_$id${user.uid}';
+
+
+
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers() {
     return firestore.collection("users").snapshots();

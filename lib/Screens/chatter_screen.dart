@@ -1,11 +1,14 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_final_fields
 
 import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatters/API/api.dart';
+import 'package:chatters/Models/messages.dart';
 import 'package:chatters/Models/user.dart';
+import 'package:chatters/Widgets/message_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +21,10 @@ class ChatterScreen extends StatefulWidget {
 }
 
 class _ChatterScreenState extends State<ChatterScreen> {
+  //all messages
+  //Cuser currentUser = APIs.user.uid;
+  List<Messages> _msglist = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,50 +35,40 @@ class _ChatterScreenState extends State<ChatterScreen> {
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder(
-              stream: APIs.getAllMessages(),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                  case ConnectionState.none:
-                //    return const Center(child: CircularProgressIndicator());
-                  case ConnectionState.active:
-                  case ConnectionState.done:
-                     final data = snapshot.data?.docs;
-//                     log('Data: ${jsonEncode(data[0].data())}');
-                    // _list =
-                    //     data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
-                     //         final data = snapshot.data?.docs;
-                     //         _list =
-                     //             data?.map((e) => Cuser.fromJson(e.data())).toList() ?? [];
-            
-                     //         print('Data: $data'); // Check the retrieved data
-                    final _list = ['hi','hello'];
-            
-                    if (_list.isNotEmpty) {
-                    return ListView.builder(
-                  itemCount: _list.length,
-                  padding: EdgeInsets.only(
-                      top: MediaQuery.sizeOf(context).height * .01),
-                  physics: const BouncingScrollPhysics(),
+              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: APIs.getAllMessages(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              }
+
+              final data = snapshot.data?.docs;
+              if (data != null && data.isNotEmpty) {
+                List<Messages> _msglist = data
+                    .map((doc) =>
+                        Messages.fromJson(doc.data() as Map<String, dynamic>))
+                    .toList();
+
+                return ListView.builder(
+                  itemCount: _msglist.length,
                   itemBuilder: (context, index) {
-                    return Text('Message: ${_list[index]}');
+                    return MessageCard(messages: _msglist[index]);
                   },
                 );
-            
-                    } else {
-                            return const Center(
-                        child: Text(
-                          "Say Hi 👋",
-                          style: TextStyle(fontSize: 30),
-                        ),
-                      );
-            
-                    }
-                }
-              },
-            ),
-          ),
+              } else {
+                return Center(
+                  child: Text(
+                    "Say Hi 👋",
+                    style: TextStyle(fontSize: 30),
+                  ),
+                );
+              }
+            },
+          )),
           _chatInput()
         ],
       ),
