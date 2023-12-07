@@ -27,7 +27,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late UserBloc _userBloc;
-  List<Cuser> _list = [];
+  List<Cuser> _userList = [];
   final List<Cuser> _searchList = [];
   // for storing search status
   bool _isSearching = false;
@@ -46,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () {
+          //if user presses back button, search unselected and app does not close
           if (_isSearching) {
             setState(() {
               _isSearching = !_isSearching;
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         //search logic
                         _searchList.clear();
 
-                        for (var i in _list) {
+                        for (var i in _userList) {
                           if (i.name
                                   .toLowerCase()
                                   .contains(val.toLowerCase()) ||
@@ -114,8 +115,8 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.only(bottom: 10.0),
               child: FloatingActionButton(
                 onPressed: () async {
-                  await APIs.auth.signOut();
-                  await GoogleSignIn().signOut();
+                  // await APIs.auth.signOut();
+                  // await GoogleSignIn().signOut();
                 },
                 child: const Icon(Icons.add_comment_rounded),
               ),
@@ -134,11 +135,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     stream: state.user(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        List<Cuser> userList = snapshot.data!.docs
+                         _userList = snapshot.data!.docs
                             .map((doc) => Cuser.fromJson(doc.data()))
                             .toList();
 
-                        if (userList.isEmpty) {
+                        if (_userList.isEmpty) {
                           // Handle empty list
                           return const Center(
                             child: Text(
@@ -149,14 +150,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
 
                         return ListView.builder(
-                          itemCount: userList.length,
+                          itemCount: _isSearching ? _searchList.length : _userList.length,
                           padding: EdgeInsets.only(
                             top: MediaQuery.of(context).size.height * .01,
                           ),
                           physics: const BouncingScrollPhysics(),
                           itemBuilder: (context, index) {
                             return ChatterCard(
-                              user: userList[index],
+                              user: _isSearching ? _searchList[index] : _userList[index],
                             );
                           },
                         );
