@@ -25,6 +25,8 @@ class _ChatterScreenState extends State<ChatterScreen> {
   //Cuser currentUser = APIs.user.uid;
   List<Messages> _msglist = [];
 
+  final _textController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,24 +38,23 @@ class _ChatterScreenState extends State<ChatterScreen> {
         children: [
           Expanded(
               child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: APIs.getAllMessages(),
+            stream: APIs.getAllMessages(widget.user),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return SizedBox();
               }
 
               final data = snapshot.data?.docs;
-              if (data != null && data.isNotEmpty) {
-                List<Messages> _msglist = data
-                    .map((doc) =>
+              
+                 _msglist = data
+                    ?.map((doc) =>
                         Messages.fromJson(doc.data() as Map<String, dynamic>))
-                    .toList();
-
-                return ListView.builder(
+                    .toList() ?? [];
+                if (data != null && data.isNotEmpty) {                return ListView.builder(
                   itemCount: _msglist.length,
                   itemBuilder: (context, index) {
                     return MessageCard(messages: _msglist[index]);
@@ -132,11 +133,13 @@ class _ChatterScreenState extends State<ChatterScreen> {
               child: Row(
                 children: [
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                      },
                       icon: const Icon(Icons.emoji_emotions,
                           color: Colors.blueAccent, size: 26)),
                   Expanded(
                       child: TextField(
+                      controller: _textController,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     decoration: const InputDecoration(
@@ -161,7 +164,12 @@ class _ChatterScreenState extends State<ChatterScreen> {
             ),
           ),
           MaterialButton(
-            onPressed: () {},
+            onPressed: () {
+              if (_textController.text.isNotEmpty) {
+                APIs.sendMessage(widget.user, _textController.text);
+                _textController.text = ''; 
+              }
+            },
             minWidth: 0,
             padding:
                 const EdgeInsets.only(top: 10, bottom: 10, right: 5, left: 10),

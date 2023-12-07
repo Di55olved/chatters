@@ -17,9 +17,9 @@ class _MessageCardState extends State<MessageCard> {
   @override
   @override
   Widget build(BuildContext context) {
-    final fromId = widget.messages.fromId.trim().toLowerCase();
-    print('From ID: $fromId');
-    return fromId == "test1" ? __blueMsg() : __greenMsg();
+    //final fromId = .trim().toLowerCase();
+   // print('From ID: $fromId');
+    return widget.messages.fromId == APIs.user.uid ? __blueMsg() : __greenMsg();
   }
 
   Widget __blueMsg() {
@@ -51,7 +51,7 @@ class _MessageCardState extends State<MessageCard> {
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
-                  bottomRight: Radius.circular(30))),
+                  bottomLeft: Radius.circular(30))),
           child:
               //show text
               Text(

@@ -34,15 +34,15 @@ class Cuser {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['id '] = id;
+    data['id'] = id;
     data['about'] = about;
     data['created_at'] = createdAt;
-    data[' is_online'] = isOnline;
+    data['is_online'] = isOnline;
     data['last_active'] = lastActive;
     data['email'] = email;
     data['push_token'] = pushToken;
-    data['name '] = name;
-    data['image '] = image;
+    data['name'] = name;
+    data['image'] = image;
     return data;
   }
 }
