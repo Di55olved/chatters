@@ -21,7 +21,7 @@ class Cuser {
       required this.image});
 
   Cuser.fromJson(Map<String, dynamic> json) {
-    id = json['id'] ?? " ";
+    id = json['id '] ?? " ";
     about = json['about'] ?? " ";
     createdAt = json['created_at'] ?? " ";
     isOnline = json[' is_online'] ?? " ";
