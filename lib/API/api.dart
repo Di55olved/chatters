@@ -66,7 +66,6 @@ class APIs {
   static String getConversationID(String id) => user.uid.hashCode <= id.hashCode
       ? '${user.uid}_$id'
       : '${id}_${user.uid}';
-    
 
   //sending message
   static Future<void> sendMessage(Cuser cuser, String msg) async {
@@ -100,7 +99,13 @@ class APIs {
       'about': me.about,
     });
   }
-}
+
+static Future<void> updateMessageReadStatus(Messages message) async {
+    firestore
+        .collection('chats/${getConversationID(message.fromId)}/messages/')
+        .doc(message.sent)
+        .update({'read': DateTime.now().millisecondsSinceEpoch.toString()});
+  }}
 
 
 //firestore.collection("users").where('id',isNotEqualTo: user.uid).snapshots();

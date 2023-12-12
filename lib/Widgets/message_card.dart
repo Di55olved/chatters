@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatters/API/api.dart';
 import 'package:chatters/Models/messages.dart';
+import 'package:chatters/Support/date_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -18,24 +21,22 @@ class _MessageCardState extends State<MessageCard> {
   @override
   Widget build(BuildContext context) {
     //final fromId = .trim().toLowerCase();
-   // print('From ID: $fromId');
-    return widget.messages.fromId == APIs.user.uid ? __blueMsg() : __greenMsg();
+    // print('From ID: $fromId');
+    return widget.messages.fromId == APIs.user.uid ? __greenMsg() : __blueMsg();
   }
 
   Widget __blueMsg() {
+
+    if(widget.messages.read.isEmpty) {
+      APIs.updateMessageReadStatus(widget.messages);
+      print('msg read updated');
+    }
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         //message time
-        Padding(
-          padding:
-              EdgeInsets.only(left: MediaQuery.sizeOf(context).width * .04),
-          child: Text(
-            widget.messages.sent,
-            style: const TextStyle(fontSize: 13, color: Colors.black54),
-          ),
-        ),
-                //message content
+        //message content
         Flexible(
             child: Container(
           padding: EdgeInsets.all(widget.messages.type == Type.image
@@ -51,7 +52,7 @@ class _MessageCardState extends State<MessageCard> {
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
-                  bottomLeft: Radius.circular(30))),
+                  bottomRight: Radius.circular(30))),
           child:
               //show text
               Text(
@@ -59,8 +60,15 @@ class _MessageCardState extends State<MessageCard> {
             style: const TextStyle(fontSize: 15, color: Colors.black87),
           ),
         )),
-
-
+        Padding(
+          padding:
+              EdgeInsets.only(right: MediaQuery.sizeOf(context).width * .04),
+          child: Text(
+            MyDateUtil.getFormattedTime(
+                context: context, time: widget.messages.sent),
+            style: const TextStyle(fontSize: 13, color: Colors.black54),
+          ),
+        ),
       ],
     );
   }
@@ -70,6 +78,27 @@ class _MessageCardState extends State<MessageCard> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         //message content
+
+        //message time
+        Padding(
+          padding:
+              EdgeInsets.only(left: MediaQuery.sizeOf(context).width * .04),
+          child: Row(
+            children: [
+
+              if (widget.messages.read != null && widget.messages.read.isNotEmpty) 
+                const Icon(
+                  Icons.done_all_rounded,
+                  color: Colors.blue,
+                ),
+              Text(
+                MyDateUtil.getFormattedTime(
+                    context: context, time: widget.messages.sent),
+                style: const TextStyle(fontSize: 13, color: Colors.black54),
+              ),
+            ],
+          ),
+        ),
         Flexible(
             child: Container(
           padding: EdgeInsets.all(widget.messages.type == Type.image
@@ -85,7 +114,7 @@ class _MessageCardState extends State<MessageCard> {
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
-                  bottomRight: Radius.circular(30))),
+                  bottomLeft: Radius.circular(30))),
           child:
               //show text
               Text(
@@ -93,20 +122,6 @@ class _MessageCardState extends State<MessageCard> {
             style: const TextStyle(fontSize: 15, color: Colors.black87),
           ),
         )),
-
-        //message time
-        Padding(
-            padding: EdgeInsets.only(right: MediaQuery.sizeOf(context).width * .04),
-          child: Row(
-            children: [
-              Icon(Icons.done_all_rounded, color: Colors.blue,),
-              Text(
-                widget.messages.sent,
-                style: const TextStyle(fontSize: 13, color: Colors.black54),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }

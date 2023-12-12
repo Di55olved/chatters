@@ -24,12 +24,12 @@ class Cuser {
     id = json['id '] ?? " ";
     about = json['about'] ?? " ";
     createdAt = json['created_at'] ?? " ";
-    isOnline = json[' is_online'] ?? " ";
+    isOnline = json[' is_online'] ?? false;
     lastActive = json['last_active'] ?? " ";
     email = json['email'] ?? " ";
     pushToken = json['push_token'] ?? " ";
     name = json['name '] ?? " ";
-    image = json['image '] ?? " ";
+    image = json['image'] ?? " ";
   }
 
   Map<String, dynamic> toJson() {
