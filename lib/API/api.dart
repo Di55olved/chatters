@@ -100,12 +100,22 @@ class APIs {
     });
   }
 
-static Future<void> updateMessageReadStatus(Messages message) async {
+  static Future<void> updateMessageReadStatus(Messages message) async {
     firestore
         .collection('chats/${getConversationID(message.fromId)}/messages/')
         .doc(message.sent)
-        .update({'read': DateTime.now().millisecondsSinceEpoch.toString()});
-  }}
+        .update({'read': '1702525613465'});
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getLastMessages(
+      Cuser user) {
+    return firestore
+        .collection('chats/${getConversationID(user.id)}/messages/')
+        .orderBy('sent', descending: true)
+        .limit(1)
+        .snapshots();
+  }
+}
 
 
 //firestore.collection("users").where('id',isNotEqualTo: user.uid).snapshots();
