@@ -29,7 +29,7 @@ class Cuser {
     email = json['email'] ?? " ";
     pushToken = json['push_token'] ?? " ";
     name = json['name '] ?? " ";
-    image = json['image'] ?? " ";
+    image = json['image '] ?? " ";
   }
 
   Map<String, dynamic> toJson() {

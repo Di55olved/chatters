@@ -28,7 +28,7 @@ class Messages {
     final data = <String, dynamic>{};
     data['toId'] = toId;
     data['msg'] = msg;
-    data['read'] = read;
+    data[' read'] = read;
     data['type'] = type.name;
     data['fromId'] = fromId;
     data['sent'] = sent;

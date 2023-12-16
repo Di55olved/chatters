@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatters/API/api.dart';
@@ -26,52 +28,92 @@ class _ChatterScreenState extends State<ChatterScreen> {
   List<Messages> _msglist = [];
 
   final _textController = TextEditingController();
+  bool _showEmoji = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        flexibleSpace: _appBar(),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: APIs.getAllMessages(widget.user),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return SizedBox();
-              }
-
-              final data = snapshot.data?.docs;
-              
-                 _msglist = data
-                    ?.map((doc) =>
-                        Messages.fromJson(doc.data() as Map<String, dynamic>))
-                    .toList() ?? [];
-                if (data != null && data.isNotEmpty) {                return ListView.builder(
-                  itemCount: _msglist.length,
-                  itemBuilder: (context, index) {
-                    return MessageCard(messages: _msglist[index]);
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: SafeArea(
+        child: WillPopScope(
+         onWillPop: () {
+          //if user presses back button, emoji unselected and app does not close
+          if (_showEmoji) {
+            setState(() {
+              _showEmoji = !_showEmoji;
+            });
+            return Future.value(false);
+          } else {
+            return Future.value(true);
+          }
+        },
+          child: Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              flexibleSpace: _appBar(),
+            ),
+            body: Column(
+              children: [
+                Expanded(
+                    child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: APIs.getAllMessages(widget.user),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    }
+          
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return SizedBox();
+                    }
+          
+                    final data = snapshot.data?.docs;
+          
+                    _msglist = data
+                            ?.map((doc) => Messages.fromJson(
+                                doc.data() as Map<String, dynamic>))
+                            .toList() ??
+                        [];
+                    if (data != null && data.isNotEmpty) {
+                      return ListView.builder(
+                        itemCount: _msglist.length,
+                        itemBuilder: (context, index) {
+                          return MessageCard(messages: _msglist[index]);
+                        },
+                      );
+                    } else {
+                      return Center(
+                        child: Text(
+                          "Say Hi 👋",
+                          style: TextStyle(fontSize: 30),
+                        ),
+                      );
+                    }
                   },
-                );
-              } else {
-                return Center(
-                  child: Text(
-                    "Say Hi 👋",
-                    style: TextStyle(fontSize: 30),
-                  ),
-                );
-              }
-            },
-          )),
-          _chatInput()
-        ],
+                )),
+                _chatInput(),
+                if(_showEmoji) 
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.35,
+                    child: EmojiPicker(
+                      onBackspacePressed: () {
+                        // Do something when the user taps the backspace button (optional)
+                        // Set it to null to hide the Backspace-Button
+                      },
+                      textEditingController:
+                          _textController, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
+                      config: Config(
+                        columns: 7,
+                        emojiSizeMax: 32 *
+                            (Platform.isIOS
+                                ? 1.30
+                                : 1.0), // Issue: https://github.com/flutter/flutter/issues/28894
+                      ),
+                    ),
+                  )
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -132,15 +174,21 @@ class _ChatterScreenState extends State<ChatterScreen> {
                   borderRadius: BorderRadius.circular(15)),
               child: Row(
                 children: [
+                  //emoji button
                   IconButton(
                       onPressed: () {
+                        FocusScope.of(context).unfocus();
+                        setState(() => _showEmoji = !_showEmoji);
                       },
                       icon: const Icon(Icons.emoji_emotions,
                           color: Colors.blueAccent, size: 26)),
                   Expanded(
                       child: TextField(
-                      controller: _textController,
+                    controller: _textController,
                     keyboardType: TextInputType.multiline,
+                    onTap: () {
+                      if (_showEmoji) setState(() => _showEmoji = !_showEmoji);
+                    },
                     maxLines: null,
                     decoration: const InputDecoration(
                         hintText: 'Type Something...',
@@ -167,7 +215,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
             onPressed: () {
               if (_textController.text.isNotEmpty) {
                 APIs.sendMessage(widget.user, _textController.text);
-                _textController.text = ''; 
+                _textController.text = '';
               }
             },
             minWidth: 0,

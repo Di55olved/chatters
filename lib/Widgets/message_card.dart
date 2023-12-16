@@ -24,12 +24,11 @@ class _MessageCardState extends State<MessageCard> {
     return widget.messages.fromId == APIs.user.uid ? __greenMsg() : __blueMsg();
   }
 
-
   Widget __blueMsg() {
     //update last read message if sender and receiver are different
-    if (widget.messages.read.isEmpty) {
+    if (widget.messages.read.isNotEmpty) {
+      // Update the read status only if it's empty or null
       APIs.updateMessageReadStatus(widget.messages);
-      print('read status updated');
     }
 
     return Row(
@@ -42,7 +41,8 @@ class _MessageCardState extends State<MessageCard> {
                 ? MediaQuery.sizeOf(context).width * .03
                 : MediaQuery.sizeOf(context).width * .04),
             margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.sizeOf(context).width * .04, vertical: MediaQuery.sizeOf(context).height * .01),
+                horizontal: MediaQuery.sizeOf(context).width * .04,
+                vertical: MediaQuery.sizeOf(context).height * .01),
             decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 221, 245, 255),
                 border: Border.all(color: Colors.lightBlue),
@@ -77,7 +77,8 @@ class _MessageCardState extends State<MessageCard> {
 
         //message time
         Padding(
-          padding: EdgeInsets.only(right: MediaQuery.sizeOf(context).width * .04),
+          padding:
+              EdgeInsets.only(right: MediaQuery.sizeOf(context).width * .04),
           child: Text(
             MyDateUtil.getFormattedTime(
                 context: context, time: widget.messages.sent),
@@ -100,7 +101,10 @@ class _MessageCardState extends State<MessageCard> {
             SizedBox(width: MediaQuery.sizeOf(context).width * .04),
 
             //double tick blue icon for message read
-            Icon (Icons.done_all_rounded, color: widget.messages.read.isNotEmpty ? Colors.blue : Colors.grey, size: 20),
+            Icon(Icons.done_all_rounded,
+                color:
+                    widget.messages.read.isNotEmpty ? Colors.blue : Colors.grey,
+                size: 20),
             //for adding some space
             const SizedBox(width: 2),
 
@@ -120,7 +124,8 @@ class _MessageCardState extends State<MessageCard> {
                 ? MediaQuery.sizeOf(context).width * .03
                 : MediaQuery.sizeOf(context).width * .04),
             margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.sizeOf(context).width * .04, vertical: MediaQuery.sizeOf(context).height * .01),
+                horizontal: MediaQuery.sizeOf(context).width * .04,
+                vertical: MediaQuery.sizeOf(context).height * .01),
             decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 218, 255, 176),
                 border: Border.all(color: Colors.lightGreen),
@@ -155,5 +160,4 @@ class _MessageCardState extends State<MessageCard> {
       ],
     );
   }
-
 }

@@ -15,6 +15,7 @@ class APIs {
 
   static late Cuser me;
   //getter method
+  //TODO: uncheck used on nul value
   static get user => auth.currentUser!;
 
   // checking if user already exits
@@ -82,7 +83,7 @@ class APIs {
     final ref =
         firestore.collection('chats/${getConversationID(cuser.id)}/messages/');
 
-    await ref.doc().set(message.toJson());
+    await ref.doc(time).set(message.toJson());
   }
 
 //get all msg for a specific conversation from firestore
@@ -100,12 +101,23 @@ class APIs {
     });
   }
 
-  static Future<void> updateMessageReadStatus(Messages message) async {
-    firestore
-        .collection('chats/${getConversationID(message.fromId)}/messages/')
-        .doc(message.sent)
-        .update({'read': '1702525613465'});
+static Future<void> updateMessageReadStatus(Messages message) async {
+  try {
+    if (message.read == null || message.read.isEmpty) {
+      await firestore
+          .collection('chats/${getConversationID(message.fromId)}/messages/')
+          .doc(message.sent)
+          .update({'read': DateTime.now().millisecondsSinceEpoch.toString()});
+      print('Read status updated successfully');
+    } else {
+      print('Read status already exists: ${message.read}');
+    }
+  } catch (e) {
+    print('Error updating read status: $e');
+    // Handle the error as needed: log, notify the user, etc.
   }
+}
+
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getLastMessages(
       Cuser user) {
