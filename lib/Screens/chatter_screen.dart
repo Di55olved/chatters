@@ -76,6 +76,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
                         [];
                     if (data != null && data.isNotEmpty) {
                       return ListView.builder(
+                        reverse: true,
                         itemCount: _msglist.length,
                         itemBuilder: (context, index) {
                           return MessageCard(messages: _msglist[index]);

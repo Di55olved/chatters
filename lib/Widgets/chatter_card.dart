@@ -69,7 +69,9 @@ class _ChatterCardState extends State<ChatterCard> {
                 title: Text(widget.user.name!),
                 subtitle: Text(
                   //show latest message
-                  _message != null ? _message!.msg : widget.user.about!,
+                  _message != null ?
+                    _message!.type == Type.image ? 'image':
+                   _message!.msg : widget.user.about!,
                   maxLines: 1,
                 ),
                 trailing:
