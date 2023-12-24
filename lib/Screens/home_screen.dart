@@ -72,10 +72,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         for (var i in _userList) {
                           if (i.name
-                                  .toLowerCase()
+                                  !.toLowerCase()
                                   .contains(val.toLowerCase()) ||
                               i.email
-                                  .toLowerCase()
+                                  !.toLowerCase()
                                   .contains(val.toLowerCase())) {
                             _searchList.add(i);
                             setState(() {
@@ -184,7 +184,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
                 return const SizedBox();
               },
-            )),
+            )
+            ),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatters/Models/messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -73,7 +75,7 @@ class APIs {
     final time = DateTime.now().millisecondsSinceEpoch.toString();
 
     final Messages message = Messages(
-        toId: cuser.id,
+        toId: cuser.id!,
         msg: msg,
         read: '',
         type: Type.text,
@@ -81,7 +83,7 @@ class APIs {
         sent: time);
 
     final ref =
-        firestore.collection('chats/${getConversationID(cuser.id)}/messages/');
+        firestore.collection('chats/${getConversationID(cuser.id!)}/messages/');
 
     await ref.doc(time).set(message.toJson());
   }
@@ -90,7 +92,7 @@ class APIs {
   static Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(
       Cuser user) {
     return firestore
-        .collection('chats/${getConversationID(user.id)}/messages/')
+        .collection('chats/${getConversationID(user.id!)}/messages/')
         .snapshots();
   }
 
@@ -122,10 +124,34 @@ static Future<void> updateMessageReadStatus(Messages message) async {
   static Stream<QuerySnapshot<Map<String, dynamic>>> getLastMessages(
       Cuser user) {
     return firestore
-        .collection('chats/${getConversationID(user.id)}/messages/')
+        .collection('chats/${getConversationID(user.id!)}/messages/')
         .orderBy('sent', descending: true)
         .limit(1)
         .snapshots();
+  }
+
+    // update profile picture of user
+  static Future<void> updateProfilePicture(File file) async {
+    //getting image file extension
+    final ext = file.path.split('.').last;
+    print('Extension: $ext');
+
+    //storage file ref with path
+    final ref = storage.ref().child('profile_pictures/${user.uid}.$ext');
+
+    //uploading image
+    await ref
+        .putFile(file, SettableMetadata(contentType: 'image/$ext'))
+        .then((p0) {
+      print('Data Transferred: ${p0.bytesTransferred / 1000} kb');
+    });
+
+    //updating image in firestore database
+    me.image = await ref.getDownloadURL();
+    await firestore
+        .collection('users')
+        .doc(user.uid)
+        .update({'image ': me.image});
   }
 }
 

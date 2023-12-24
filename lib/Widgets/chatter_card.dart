@@ -59,17 +59,17 @@ class _ChatterCardState extends State<ChatterCard> {
                     child: CachedNetworkImage(
                       width: MediaQuery.sizeOf(context).width * .055,
                       height: MediaQuery.sizeOf(context).height * .055,
-                      imageUrl: widget.user.image,
+                      imageUrl: widget.user.image!,
                       errorWidget: (context, url, error) => const CircleAvatar(
                         child: Icon(CupertinoIcons.person),
                       ),
                     ),
                   ),
                 ),
-                title: Text(widget.user.name),
+                title: Text(widget.user.name!),
                 subtitle: Text(
                   //show latest message
-                  _message != null ? _message!.msg : widget.user.about,
+                  _message != null ? _message!.msg : widget.user.about!,
                   maxLines: 1,
                 ),
                 trailing:

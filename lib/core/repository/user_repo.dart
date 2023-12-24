@@ -10,8 +10,8 @@ class UserRepository {
   Future<Stream<QuerySnapshot<Map<String, dynamic>>> Function()> getuser() async {
     return userApiClient.getAllUsers;
   }
-  Future<Future<List<Cuser>>> getUserMoc() async {
-    return userApiClient.fetchUserMoc();
-  }
+  // Future<Stream<QuerySnapshot<Map<String, dynamic>>> Function()> getUserMoc() async {
+  //   return userApiClient.fetchUserMoc();
+  // }
 
 }

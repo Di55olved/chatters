@@ -24,9 +24,36 @@ class UserApiClient {
     return firestore.collection("users").snapshots();
   }
 
-  Future<List<Cuser>> fetchUserMoc() async {
-    return [Cuser(id: 'id', about: 'about', createdAt: 'createdAt', isOnline: false, lastActive: 'lastActive', email: 'email', pushToken: 'pushToken', name: 'name', image: 'image')];
-  }
+  // Stream<QuerySnapshot<Map<String, dynamic>>> fetchUserMoc() {
+  //   // Simulating the conversion of List<Cuser> to a Stream<QuerySnapshot>
+  //   final List<Cuser> users = [
+  //     Cuser(id: 'id', about: 'about', createdAt: 'createdAt', isOnline: false, lastActive: 'lastActive', email: 'email', pushToken: 'pushToken', name: 'John', image: 'image'),
+  //     Cuser(id: 'id', about: 'about', createdAt: 'createdAt', isOnline: false, lastActive: 'lastActive', email: 'email', pushToken: 'pushToken', name: 'Doe', image: 'image'),
+  //     Cuser(id: 'id', about: 'about', createdAt: 'createdAt', isOnline: false, lastActive: 'lastActive', email: 'email', pushToken: 'pushToken', name: 'Marry', image: 'image'),
+  //     Cuser(id: 'id', about: 'about', createdAt: 'createdAt', isOnline: false, lastActive: 'lastActive', email: 'email', pushToken: 'pushToken', name: 'James', image: 'image'),
+  //     Cuser(id: 'id', about: 'about', createdAt: 'createdAt', isOnline: false, lastActive: 'lastActive', email: 'email', pushToken: 'pushToken', name: 'Elenios', image: 'image'),
+  //     // Add other Cuser instances as needed
+  //   ];
+
+  //   // Convert the list of Cuser objects to QuerySnapshot objects
+  //   final snapshots = users.map((user) {
+  //     final data = {
+  //       'id': user.id,
+  //       'name': user.name,
+  //       // Include other user attributes here...
+  //     };
+  //     return QueryDocumentSnapshot<Map<String, dynamic>>(
+  //       data: data,
+  //       reference: null, // Set the reference as needed
+  //     );
+  //   }).toList();
+
+  //   return Stream.fromIterable([QuerySnapshot<Map<String, dynamic>>.from(
+  //     snapshots,
+  //     QuerySnapshotMetadata(hasPendingWrites: false), // Add metadata as needed
+  //   )]);
+  // }
+
 }
 
 class Endpoints {

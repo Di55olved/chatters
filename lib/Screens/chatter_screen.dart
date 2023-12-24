@@ -143,14 +143,14 @@ class _ChatterScreenState extends State<ChatterScreen> {
                 child: CachedNetworkImage(
                   width: MediaQuery.sizeOf(context).width * .045,
                   height: MediaQuery.sizeOf(context).height * .045,
-                  imageUrl: widget.user.image,
+                  imageUrl: widget.user.image!,
                   errorWidget: (context, url, error) => const CircleAvatar(
                     child: Icon(CupertinoIcons.person),
                   ),
                 ),
               ),
             ),
-            title: Text(widget.user.name, style: TextStyle(fontSize: 14)),
+            title: Text(widget.user.name!, style: TextStyle(fontSize: 14)),
             subtitle: const Text(
               'Last seen, 10:53',
               style: TextStyle(fontSize: 13, color: Colors.black54),
