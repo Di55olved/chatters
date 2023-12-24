@@ -29,7 +29,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
   List<Messages> _msglist = [];
 
   final _textController = TextEditingController();
-  bool _showEmoji = false;
+  bool _showEmoji = false, _isUploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,17 +37,17 @@ class _ChatterScreenState extends State<ChatterScreen> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: SafeArea(
         child: WillPopScope(
-         onWillPop: () {
-          //if user presses back button, emoji unselected and app does not close
-          if (_showEmoji) {
-            setState(() {
-              _showEmoji = !_showEmoji;
-            });
-            return Future.value(false);
-          } else {
-            return Future.value(true);
-          }
-        },
+          onWillPop: () {
+            //if user presses back button, emoji unselected and app does not close
+            if (_showEmoji) {
+              setState(() {
+                _showEmoji = !_showEmoji;
+              });
+              return Future.value(false);
+            } else {
+              return Future.value(true);
+            }
+          },
           child: Scaffold(
             appBar: AppBar(
               automaticallyImplyLeading: false,
@@ -62,13 +62,13 @@ class _ChatterScreenState extends State<ChatterScreen> {
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     }
-          
+
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return SizedBox();
                     }
-          
+
                     final data = snapshot.data?.docs;
-          
+
                     _msglist = data
                             ?.map((doc) => Messages.fromJson(
                                 doc.data() as Map<String, dynamic>))
@@ -92,8 +92,22 @@ class _ChatterScreenState extends State<ChatterScreen> {
                     }
                   },
                 )),
+                if (_isUploading == true)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ),
+                  ),
                 _chatInput(),
-                if(_showEmoji) 
+                if (_showEmoji)
                   SizedBox(
                     height: MediaQuery.sizeOf(context).height * 0.35,
                     child: EmojiPicker(
@@ -198,23 +212,46 @@ class _ChatterScreenState extends State<ChatterScreen> {
                         border: InputBorder.none),
                   )),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final ImagePicker picker = ImagePicker();
+
+                        // Pick an image
+                        final List<XFile> images =
+                            await picker.pickMultiImage(imageQuality: 70);
+                        for (var i in images) {
+                          //iterate post to firebase
+                          setState(() {
+                            _isUploading = true;
+                          });
+                          await APIs.sendChatImage(widget.user, File(i.path));
+                          setState(() {
+                            _isUploading = false;
+                          });
+                        }
+                      },
                       icon: const Icon(Icons.image,
                           color: Colors.blueAccent, size: 26)),
                   IconButton(
                       onPressed: () async {
-                                                final ImagePicker picker = ImagePicker();
+                        final ImagePicker picker = ImagePicker();
 
-                        // Pick an image
+                        // Pick an image from camera
                         final XFile? image = await picker.pickImage(
                             source: ImageSource.camera, imageQuality: 70);
                         if (image != null) {
+                          setState(() {
+                            _isUploading = true;
+                          });
 
-                          APIs.sendChatImage(widget.user, File(image.path));
+                          await APIs.sendChatImage(
+                              widget.user, File(image.path));
+                          setState(() {
+                            _isUploading = false;
+                          });
+
                           // for hiding bottom sheet
-                          Navigator.pop(context);
+                          //   Navigator.pop(context);
                         }
- 
                       },
                       icon: const Icon(Icons.camera_alt_rounded,
                           color: Colors.blueAccent, size: 26)),

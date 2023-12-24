@@ -149,7 +149,13 @@ class _MessageCardState extends State<MessageCard> {
                       imageUrl: widget.messages.msg,
                       placeholder: (context, url) => const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
                       ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.image, size: 70),
