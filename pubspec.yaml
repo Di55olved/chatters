@@ -47,7 +47,8 @@ dependencies:
   cached_network_image: ^3.3.0
   image_picker: ^1.0.4
   firebase_storage: ^11.5.2
-
+  provider: 
+  email_otp:
    
   
 

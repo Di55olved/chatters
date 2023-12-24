@@ -1,9 +1,9 @@
 //import 'package:flutter/cupertino.dart';
 import 'dart:developer';
 
+import 'package:chatters/Screens/auth/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:chatters/API/api.dart';
-import 'package:chatters/Screens/auth/login_screen.dart';
 import 'package:chatters/Screens/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
             context, MaterialPageRoute(builder: (_) => const HomeScreen()));
       } else {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+            context, MaterialPageRoute(builder: (_) => const SignInPage()));
       }
     });
   }
