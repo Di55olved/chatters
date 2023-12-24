@@ -13,6 +13,7 @@ import 'package:chatters/Widgets/message_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatterScreen extends StatefulWidget {
   final Cuser user;
@@ -200,12 +201,21 @@ class _ChatterScreenState extends State<ChatterScreen> {
                       icon: const Icon(Icons.image,
                           color: Colors.blueAccent, size: 26)),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                                                final ImagePicker picker = ImagePicker();
+
+                        // Pick an image
+                        final XFile? image = await picker.pickImage(
+                            source: ImageSource.camera, imageQuality: 70);
+                        if (image != null) {
+
+                          APIs.sendChatImage(widget.user, File(image.path));
+                          // for hiding bottom sheet
+                          Navigator.pop(context);
+                        }
+ 
+                      },
                       icon: const Icon(Icons.camera_alt_rounded,
-                          color: Colors.blueAccent, size: 26)),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.camera_enhance,
                           color: Colors.blueAccent, size: 26)),
                 ],
               ),
@@ -214,7 +224,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
           MaterialButton(
             onPressed: () {
               if (_textController.text.isNotEmpty) {
-                APIs.sendMessage(widget.user, _textController.text);
+                APIs.sendMessage(widget.user, _textController.text, Type.text);
                 _textController.text = '';
               }
             },
